@@ -94,4 +94,8 @@
     <Content Include="appicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>echo copying regex_patterns.json into build directory
+copy  $(SolutionDir)regex_patterns.json $(SolutionDir)$(OutDir)regex_patterns.json</PreBuildEvent>
+  </PropertyGroup>
 </Project>
