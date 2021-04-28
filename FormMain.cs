@@ -28,6 +28,13 @@ namespace Bufudyne
 
         private async void btnDownloadAlbum_Click(object sender, EventArgs e)
         {
+            // Simple input validation - Presence Check
+            if (tbxAlbumEntry.Text == "")
+            {
+                lblAlbumProgress.Text = "Album Progress : [ERR - NO URL PROVIDED]";
+                return;
+            }
+
             // Update GUI labels
             lblAlbumProgress.Text = "Album Progress : [FETCHING ALBUM PAGE DATA]";
 
@@ -36,7 +43,7 @@ namespace Bufudyne
             string albumPageContent = await albumPageResponse.Content.ReadAsStringAsync();
 
             // Get creator page URL
-            string[] splitURL = tbxAlbumEntry.Text.Split(Convert.ToChar("/"));
+            string[] splitURL = tbxAlbumEntry.Text.Split('/');
             string creatorPageURL = splitURL[0] + "//" + splitURL[2];
 
             // Get the track list pattern string from the regex_patterns.json file and match the HTML against it
@@ -46,30 +53,32 @@ namespace Bufudyne
             // Set up GUI elements
             pgbAlbumProgress.Maximum = Matches.Count;
             pgbAlbumProgress.Value = 0;
-            int tracksDownloaded = 0;
-            lblAlbumProgress.Text = string.Format("Album Progress : 0 / {0}", Matches.Count);
+            lblAlbumProgress.Text = $"Album Progress : 0 / {Matches.Count}";
             lblCurrentTrack.Text = "Current Track : ";
 
             // Itterate over each of the matches
+            int tracksDownloaded = 0;
             foreach (Match relativeTrackURLMatch in Matches)
             {
-                // Attatch the creator page url and relative track url to create the track page url
+                // Create full track page URL from the relative track page URL
                 string trackPageURL = creatorPageURL + relativeTrackURLMatch.Value;
 
                 // Get track name from URL
-                string[] splitTrackURL = trackPageURL.Split(Convert.ToChar("/"));
+                string[] splitTrackURL = trackPageURL.Split('/');
                 string trackName = splitTrackURL[splitTrackURL.Length - 1];
 
                 // Update the current track label
                 lblCurrentTrack.Text = "Current Track : " + trackName;
 
-                // Download track
+                // Download the track
                 await DownloadTrack(trackPageURL, trackName);
 
+                // Update statistics
+                tracksDownloaded++;
+
                 // Update GUI elements
-                pgbAlbumProgress.Value += 1;
-                tracksDownloaded += 1;
-                lblAlbumProgress.Text = String.Format("Album Progress : {0} / {1}", Convert.ToString(tracksDownloaded), Convert.ToString(Matches.Count));
+                pgbAlbumProgress.Value++;
+                lblAlbumProgress.Text = $"Album Progress : {tracksDownloaded} / {Matches.Count}";
             }
             // Reset GUI elements
             lblAlbumProgress.Text = "Album Progress : Done!";
@@ -78,11 +87,19 @@ namespace Bufudyne
 
         private async void btnDownloadTrack_Click(object sender, EventArgs e)
         {
+            // Simple input validation - Presence Check
+            if (tbxTrackEntry.Text == "")
+            {
+                lblCurrentTrack.Text = "Current Track : [ERR - NO URL PROVIDED]";
+                return;
+            }
+
             // Get track name from URL
-            string[] splitURL = tbxTrackEntry.Text.Split(Convert.ToChar("/"));
+            string[] splitURL = tbxTrackEntry.Text.Split('/');
             string trackName = splitURL[splitURL.Length - 1];
 
             // Update and setup GUI elements
+            lblAlbumProgress.Text = "Album Progress : N/A";
             lblCurrentTrack.Text = "Current Track : " + trackName;
             pgbAlbumProgress.Value = 0;
             pgbAlbumProgress.Maximum = 1;
@@ -90,11 +107,17 @@ namespace Bufudyne
             // Download the track
             await DownloadTrack(tbxTrackEntry.Text, trackName);
 
-            //Update GUI elements
-            pgbAlbumProgress.Value += 1;
-            lblCurrentTrack.Text = "Current Track : ";
+            // Update + reset GUI elements
+            pgbAlbumProgress.Value++;
+            lblCurrentTrack.Text = "Current Track : Done!";
         }
 
+        /// <summary>
+        /// Downloads a track from bandcamp when given a track page url and the track's name
+        /// </summary>
+        /// <param name="trackPageURL">The URL pointing to the page of a track. E.G. https://overkillsoundtracks.bandcamp.com/track/hard-time </param>
+        /// <param name="trackName">The name of the track, this is the name it will be saved on disc as </param>
+        /// <returns></returns>
         public async Task DownloadTrack(string trackPageURL, string trackName)
         {
             // Get the track page
