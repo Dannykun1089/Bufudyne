@@ -21,9 +21,7 @@ __Please note this app only works on windows__
 
 ## On the regex patterns file
 
-regex_patterns.json contains 2 key pairs, one for finding the relative track URLs within the album HTML page, and another for finding the audio URL within a track page.
-They are encoded in base64 and are decoded by the app. The reason for this being weird shit with escaping strings in json/C#, its essentially just to ensure the raw string is in there and nothing fucky happens with the string-escaping and it being read wrong by the program.
-This is done so in case of a site-change new patterns can be made and the app can work again by changing the file instead of writing more code
+regex_patterns.json contains 2 key pairs, one for finding the relative track URLs within the album HTML page, and another for finding the audio URL within a track page. This is done so in case of a site-change, new patterns can be made and the app can work again by changing this text file instead of writing more code and needing a new update.
 
 ## Credits
 Big thanks to my mate B00 for alowing me to use a vectorized version of his art as the icon for this program, and for giving me the idea in the first place. Love ya man <3
