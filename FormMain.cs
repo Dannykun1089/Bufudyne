@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -40,10 +39,8 @@ namespace Bufudyne
             string[] splitURL = tbxAlbumEntry.Text.Split(Convert.ToChar("/"));
             string creatorPageURL = splitURL[0] + "//" + splitURL[2];
 
-            // Decode the b64 pattern string
-            string pattern = Base64Decode(regexPatternsDict["track_list_pattern"]);
-
-            // Match against pattern
+            // Get the track list pattern string from the regex_patterns.json file and match the HTML against it
+            string pattern = regexPatternsDict["track_list_pattern"];
             MatchCollection Matches = Regex.Matches(albumPageContent, pattern);
 
             // Set up GUI elements
@@ -51,6 +48,7 @@ namespace Bufudyne
             pgbAlbumProgress.Value = 0;
             int tracksDownloaded = 0;
             lblAlbumProgress.Text = string.Format("Album Progress : 0 / {0}", Matches.Count);
+            lblCurrentTrack.Text = "Current Track : ";
 
             // Itterate over each of the matches
             foreach (Match relativeTrackURLMatch in Matches)
@@ -74,8 +72,8 @@ namespace Bufudyne
                 lblAlbumProgress.Text = String.Format("Album Progress : {0} / {1}", Convert.ToString(tracksDownloaded), Convert.ToString(Matches.Count));
             }
             // Reset GUI elements
-            lblAlbumProgress.Text = "Album Progress : ";
-            lblCurrentTrack.Text = "Current Track : ";
+            lblAlbumProgress.Text = "Album Progress : Done!";
+            lblCurrentTrack.Text = "Current Track N/A:";
         }
 
         private async void btnDownloadTrack_Click(object sender, EventArgs e)
@@ -103,10 +101,8 @@ namespace Bufudyne
             HttpResponseMessage trackPageResponse = await httpCli.GetAsync(trackPageURL);
             string trackPageContent = await trackPageResponse.Content.ReadAsStringAsync();
 
-            // Decode the b64 pattern string
-            string pattern = Base64Decode(regexPatternsDict["audio_url_pattern"]);
-
-            // Find the audio URL
+            // Get the audio track pattern string from the regex_patterns.json file and match the HTML against it
+            string pattern = regexPatternsDict["audio_url_pattern"];
             Match regexMatch = Regex.Match(trackPageContent, pattern);
 
             // Get the audio bytes
@@ -115,12 +111,6 @@ namespace Bufudyne
 
             // Write to file
             File.WriteAllBytes(trackName + ".mp3", audioBytes);
-        }
-
-        public static string Base64Decode(string base64EncodedData)
-        {
-            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
-            return Encoding.UTF8.GetString(base64EncodedBytes);
         }
     }
 }
