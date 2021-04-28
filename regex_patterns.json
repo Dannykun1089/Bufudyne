@@ -1,4 +1,4 @@
 {
-  "track_list_pattern": "KD8hPGEgaHJlZj1cIilcL3RyYWNrXC8uKig/PVwiPjxzcGFuIGNsYXNzPVwidHJhY2stdGl0bGVcIj4p",
-  "audio_url_pattern": "aHR0cHM6XC9cL3Q0LmJjYml0cy5jb21cL3N0cmVhbVwvWzAtOWEtZl0qL21wMy0xMjhcL1swLTldKlw/cD1bMC0xXVwmYW1wO3RzPVswLTldKiZhbXA7dD1bMC05YS1mXSomYW1wO3Rva2VuPVswLTlhLXpfXSo="
+  "track_list_pattern": "(?!<a href=\")\/track\/.*(?=\"><span class=\"track-title\">)",
+  "audio_url_pattern": "https:\\/\\/t4.bcbits.com\\/stream\\/[0-9a-f]*/mp3-128\\/[0-9]*\\?p=[0-1]\\&amp;ts=[0-9]*&amp;t=[0-9a-f]*&amp;token=[0-9a-z_]*"
 }
